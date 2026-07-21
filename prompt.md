@@ -41,7 +41,7 @@ AI 迭代必须直接面向当前工作树，避免创建 `history/`、`current/
 - 基础镜像：默认 `debian:trixie-slim`，构建参数 `DEBIAN_CODENAME` 可覆盖。
 - 镜像名：`md2pdf:latest`；项目版本记录在 `VERSION`。
 - PDF 引擎：Pandoc + XeLaTeX。
-- 字体：`Noto Serif CJK SC`、`Noto Sans CJK SC`、`lmodern`。
+- 字体：`Noto Serif CJK SC`、`Noto Sans CJK SC`、`lmodern`、`texlive-fonts-recommended`。
 - 页面：A4、12pt、上/下/外侧 0 cm、内侧 3 cm。
 - 页脚：`当前页 / 总页数`。
 - Mermaid：普通 `mermaid` 围栏预渲染为高清 PNG 后嵌入 PDF，CLI 版本必须显式固定。

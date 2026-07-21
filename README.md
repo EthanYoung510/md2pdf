@@ -1,10 +1,6 @@
-# md2pdf v1.2
+# md2pdf v1.2.1
 
-`md2pdf` 是一个离线 Markdown 转 PDF Docker 工具：构建阶段把 Pandoc、XeLaTeX、中文字体、Chromium 和固定版本 Mermaid CLI 打入镜像；运行阶段禁用网络，只读取 Markdown 和本地资源，输出适合打印的 PDF。
-
-## 结论：不要用目录管理版本
-
-本项目不再使用 `history/`、`current/`、`pending/` 这类目录表达版本状态。原因很简单：Git 已经提供提交历史、分支、标签和 PR 审批；再用目录复制版本，会导致重复代码、过期文档、构建入口混乱和 AI 修改范围扩大。
+`md2pdf` 是一个离线 Markdown 转 PDF Docker 工具：构建阶段把 Pandoc、XeLaTeX、中文字体、TeX 推荐字体、Chromium 和固定版本 Mermaid CLI 打入镜像；运行阶段禁用网络，只读取 Markdown 和本地资源，输出适合打印的 PDF。
 
 推荐模型：
 
@@ -75,6 +71,19 @@ docker build --build-arg DEBIAN_CODENAME=bookworm -t md2pdf:latest .
 - `--security-opt no-new-privileges`
 
 构建阶段可以联网安装依赖；运行阶段不得下载字体、浏览器、npm 包或 TeX 包。
+
+
+## 故障处理
+
+### `Font \XeTeXLink@font=pzdr ... not loadable`
+
+该错误表示 XeTeX/hyperref 需要 Zapf Dingbats / Base 35 相关 TeX 字体指标，但镜像缺少推荐字体包。v1.2.1 已在 Dockerfile 中加入 `texlive-fonts-recommended`。如果仍使用旧镜像，请重新构建：
+
+```bash
+docker build -t md2pdf:latest .
+```
+
+Podman 提示 `Emulate Docker CLI using podman` 不是本错误原因；真正失败点是 TeX 缺少 `pzdr` 字体指标。
 
 ## 文档职责
 

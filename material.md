@@ -12,7 +12,7 @@
 
 Docker 镜像把操作系统包、字体、浏览器、Node 工具、TeX 发行版和转换脚本封装为同一运行环境。离线运行的核心原则是：构建阶段可以下载依赖，运行阶段不得下载依赖。这样可以让转换行为可复现，并减少运行时供应链风险。
 
-本项目 v1.2 默认镜像基于 `debian:trixie-slim`，预装 Pandoc、XeLaTeX、中文 TeX、Noto CJK 字体、Chromium 与固定版本 Mermaid CLI。宿主机脚本用 `--network none` 禁止运行时网络访问，用 `--read-only` 限制根文件系统写入，并仅开放受限 `tmpfs` 和输出目录。
+本项目 v1.2.1 默认镜像基于 `debian:trixie-slim`，预装 Pandoc、XeLaTeX、中文 TeX、Noto CJK 字体、TeX 推荐字体、Chromium 与固定版本 Mermaid CLI。宿主机脚本用 `--network none` 禁止运行时网络访问，用 `--read-only` 限制根文件系统写入，并仅开放受限 `tmpfs` 和输出目录。
 
 ## 3. Pandoc 文档转换模型
 
@@ -28,7 +28,7 @@ Pandoc 会先把 Markdown 解析成内部文档结构，再输出为 LaTeX、HTM
 
 ## 4. XeLaTeX、TeX Live 与 CJK 字体
 
-XeLaTeX 是 TeX 排版引擎，支持 Unicode 和系统字体。中文排版通常依赖 `xeCJK` 宏包处理 CJK 字符、字体选择和断行。TeX Live 提供 LaTeX 宏包生态，`texlive-lang-chinese` 提供中文排版相关支持，`texlive-latex-extra` 提供 `fancyhdr`、`lastpage` 等常用宏包。
+XeLaTeX 是 TeX 排版引擎，支持 Unicode 和系统字体。中文排版通常依赖 `xeCJK` 宏包处理 CJK 字符、字体选择和断行。TeX Live 提供 LaTeX 宏包生态，`texlive-lang-chinese` 提供中文排版相关支持，`texlive-latex-extra` 提供 `fancyhdr`、`lastpage` 等常用宏包，`texlive-fonts-recommended` 提供 Base 35 等推荐字体，避免 XeTeX/hyperref 在生成链接符号字体时缺少 `pzdr`。
 
 本项目的版式基线：
 

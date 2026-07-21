@@ -4,7 +4,7 @@ FROM debian:${DEBIAN_CODENAME}-slim
 
 ARG MERMAID_CLI_VERSION
 LABEL org.opencontainers.image.title="md2pdf" \
-      org.opencontainers.image.version="1.2.0" \
+      org.opencontainers.image.version="1.2.1" \
       org.opencontainers.image.description="Offline Markdown to PDF converter with Pandoc, XeLaTeX and Mermaid"
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -26,6 +26,7 @@ RUN apt-get update \
       npm \
       pandoc \
       python3 \
+      texlive-fonts-recommended \
       texlive-lang-chinese \
       texlive-latex-extra \
       texlive-xetex \

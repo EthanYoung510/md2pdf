@@ -1,4 +1,4 @@
-# md2pdf 产品规格 v1.2
+# md2pdf 产品规格 v1.2.1
 
 ## 目标
 
@@ -22,7 +22,7 @@
 - 基础镜像使用 `debian:trixie-slim`；如需旧稳定版可在构建时覆盖 `DEBIAN_CODENAME`。
 - 镜像名约定为 `md2pdf:latest`，项目版本记录在 `VERSION`。
 - 使用 Pandoc + XeLaTeX 生成 PDF。
-- 安装中文 TeX、Noto CJK 字体和 `lmodern`。
+- 安装中文 TeX、Noto CJK 字体、`lmodern` 和 TeX 推荐字体包，避免 XeTeX/hyperref 缺少 `pzdr` 等基础 PostScript 字体。
 - 正文字体为 `Noto Serif CJK SC`，无衬线字体为 `Noto Sans CJK SC`。
 - 默认页面为 A4、12pt。
 - 上、下、外侧边距为 0 cm，内侧边距为 3 cm。
@@ -46,6 +46,7 @@
 - `docker/convert.sh`
 - `README.md`
 - `SPEC.md`
+- build 脚本,需要tag版本号
 - 项目评价和超出需求的建议 `suggest.md`
 - 更新后的 `prompt.md`
 - 技术培训教材 `material.md`
