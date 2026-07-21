@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-exec "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/current/md2pdf.sh" "$@"
 
 IMAGE=${MD2PDF_IMAGE:-md2pdf:latest}
 INPUT=${1:-./}
