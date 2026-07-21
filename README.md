@@ -76,11 +76,15 @@ docker build -t md2pdf:latest .
 - `README.md`：描述项目架构、使用方式和维护建议。
 - `material.md`：作为技术培训材料，解释 Docker、Pandoc、XeLaTeX、Mermaid 等技术。
 
-不建议把产品规格全部塞进 `prompt.md`，否则人类读需求和 AI 读流程会互相干扰。
+
+## 清理策略
+
+仓库只保留源代码、产品规格、维护提示词、培训材料和明确要求交付的 `material.pdf`。普通转换输出属于生成物，默认由 `.gitignore` 忽略；Docker 构建上下文通过 `.dockerignore` 排除 Git 元数据、文档和 PDF，避免把无关文件发送进镜像构建过程。
+
 
 ## AI 迭代建议
 
-人工触发 AI 迭代时，让 AI 直接修改当前工作树并提交到分支。不要让 AI 复制 `current/` 或维护 `pending/` 目录。每次迭代应：
+人工触发 AI 迭代时，让 AI 直接修改当前工作树并提交到分支。每次迭代应：
 
 1. 阅读 `prompt.md`、`SPEC.md`、`README.md`、`material.md` 和相关脚本。
 2. 如涉及最新版本或安全事实，查询官方资料。
