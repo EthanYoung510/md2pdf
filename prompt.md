@@ -1,36 +1,50 @@
-# Markdown 转 PDF 离线镜像 1.1
+# md2pdf AI 迭代提示词
 
-- 实现一个可离线运行的 Docker 工具，将 Markdown 转换为适合打印的 PDF
-- 并提供宿主机入口脚本 `md2pdf.sh`。
+## 核心目标
 
-## 输入与输出
+维护一个可离线运行的 Docker 工具，将 Markdown 转换为适合打印的 PDF，并用尽量少的项目结构承载实现、文档和培训材料。
 
-- 命令格式：`./md2pdf.sh [INPUT] [OUTPUT_DIR]`。
-- `INPUT` 为 `.md` 文件时生成同名 `.pdf`；为目录时递归转换全部 `.md`; 默认是`./`。
-- 省略 `OUTPUT_DIR` 时，每个 PDF 写入其源 Markdown 同目录。
-- 指定 `OUTPUT_DIR` 时，全部 PDF 直接写入该目录，不保留输入目录结构；扁平化重名必须报错。
-- Markdown 中的相对图片以源文件所在目录为基准并可正常嵌入。
+`SPEC.md` 是产品规格，回答“要做什么”；`prompt.md` 是 AI 维护提示词，回答“怎么迭代”。不要把两者合并成一个大 prompt。
 
+## 版本管理原则
 
-## 转换与版式
+不要用目录管理历史版本、现行版本或待审批版本。版本状态交给 Git：
 
-- 基础镜像：`debian:bookworm-slim`；镜像名：`md2pdf:latest`。
+- 历史版本：commit、tag、release。
+- 现行版本：仓库根目录工作树。
+- 待审批版本：branch、PR、issue。
+- 重要决策：必要时写 ADR，而不是复制整个项目目录。
+
+AI 迭代必须直接面向当前工作树，避免创建 `history/`、`current/`、`pending/` 这类版本目录。
+
+## 每次迭代必须执行
+
+1. 阅读 `prompt.md`、`SPEC.md`、`README.md`、`material.md` 和相关脚本。
+2. 如问题涉及最新软件版本、安全规则、包名或 Docker 行为，必须查询官方资料。
+3. 保持运行阶段离线：不得在容器运行时下载字体、浏览器、npm 包或 TeX 包。
+4. 优先精简项目结构；代码可以短，但行为必须可靠。
+5. 文档必须解释架构和技术细节；不要依赖目录复制表达流程。
+6. 运行可用测试；环境限制要明确标注。
+7. 提交 git commit，并创建 PR 元数据。
+
+## 功能基线
+
+- 命令：`./md2pdf.sh [INPUT] [OUTPUT_DIR]`。
+- `INPUT` 默认为当前目录。
+- `.md` 文件输入生成同名 `.pdf`。
+- 目录输入递归转换全部 `.md` 文件。
+- 省略 `OUTPUT_DIR` 时写回源文件目录。
+- 指定 `OUTPUT_DIR` 时扁平输出，重名必须报错。
+- Markdown 相对图片以源文件所在目录为基准。
+- 基础镜像：默认 `debian:trixie-slim`，构建参数 `DEBIAN_CODENAME` 可覆盖。
+- 镜像名：`md2pdf:latest`；项目版本记录在 `VERSION`。
 - PDF 引擎：Pandoc + XeLaTeX。
-- 安装中文 TeX、Noto CJK 和 `lmodern`。
-- 正文使用 `Noto Serif CJK SC`，无衬线使用 `Noto Sans CJK SC`。
-- 默认 A4、12pt；上/下/外侧边距 0 cm，内侧边距 3 cm。
-- 在页脚增加页码格式如： 1 / 20
-- 支持普通 `mermaid` 代码围栏,预渲染为高清图片，中文可用，再嵌入 PDF。
-- 运行时不得下载字体、浏览器、npm 包或 TeX 包。
+- 字体：`Noto Serif CJK SC`、`Noto Sans CJK SC`、`lmodern`。
+- 页面：A4、12pt、上/下/外侧 0 cm、内侧 3 cm。
+- 页脚：`当前页 / 总页数`。
+- Mermaid：普通 `mermaid` 围栏预渲染为高清 PNG 后嵌入 PDF，CLI 版本必须显式固定。
+- 安全：禁用网络、只读根文件系统、受限临时目录、`no-new-privileges`。
 
-## 安全
+## 维护建议
 
-- Docker 默认禁用网络
-- 同时启用只读根文件系统、受限临时目录
-
-## 交付物
-
-- 包含 Dockerfile、宿主机脚本、容器转换脚本、README.md.
-- 重新整理简明的需求文档,更新文件本文件( prompt.md).这个需求要求在新文件中保留。
-- 整个项目使用全部技术的培训教材,(不是项目本身的教材),要结合各项技术的权威知识 material.md
-- 用该项目脚本生成的material.pdf
+如果 AI 发现需求、代码和文档冲突，优先修正文档与脚本的一致性。若发现依赖升级会破坏离线运行、中文排版或安全边界，应保留当前稳定方案并说明原因。
