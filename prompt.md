@@ -21,7 +21,7 @@ AI 迭代必须直接面向当前工作树，避免创建 `history/`、`current/
 
 ## 每次迭代必须执行
 
-1. 阅读 `prompt.md`、`SPEC.md`、`README.md` 和相关脚本。
+1. 阅读 `prompt.md`、`SPEC.md`、`README.md`、`material.md` 和相关脚本。
 2. 如问题涉及最新软件版本、安全规则、包名或 Docker 行为，必须查询官方资料。
 3. 保持运行阶段离线：不得在容器运行时下载字体、浏览器、npm 包或 TeX 包。
 4. 优先精简项目结构；代码可以短，但行为必须可靠。
@@ -38,13 +38,13 @@ AI 迭代必须直接面向当前工作树，避免创建 `history/`、`current/
 - 省略 `OUTPUT_DIR` 时写回源文件目录。
 - 指定 `OUTPUT_DIR` 时扁平输出，重名必须报错。
 - Markdown 相对图片以源文件所在目录为基准。
-- 基础镜像：`debian:bookworm-slim`。
-- 镜像名：`md2pdf:latest`。
+- 基础镜像：默认 `debian:trixie-slim`，构建参数 `DEBIAN_CODENAME` 可覆盖。
+- 镜像名：`md2pdf:latest`；项目版本记录在 `VERSION`。
 - PDF 引擎：Pandoc + XeLaTeX。
 - 字体：`Noto Serif CJK SC`、`Noto Sans CJK SC`、`lmodern`。
 - 页面：A4、12pt、上/下/外侧 0 cm、内侧 3 cm。
 - 页脚：`当前页 / 总页数`。
-- Mermaid：普通 `mermaid` 围栏预渲染为高清 PNG 后嵌入 PDF。
+- Mermaid：普通 `mermaid` 围栏预渲染为高清 PNG 后嵌入 PDF，CLI 版本必须显式固定。
 - 安全：禁用网络、只读根文件系统、受限临时目录、`no-new-privileges`。
 
 ## 维护建议

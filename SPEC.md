@@ -1,9 +1,8 @@
-# md2pdf 产品规格
+# md2pdf 产品规格 v1.2
 
 ## 目标
 
-1.使用脚本 `md2pdf.sh` 在离线的模式下，可以自动批量的把 Markdown 转换为适合打印的 PDF。
-2.构建一个可在离线运行阶段使用的 Docker 工具,把需要的工具和环境进行最小化的封装。
+构建一个可在离线运行阶段使用的 Docker 工具，把 Markdown 转换为适合打印的 PDF，并提供宿主机入口脚本 `md2pdf.sh`。
 
 ## 命令行
 
@@ -16,12 +15,12 @@
 - `INPUT` 是目录时，递归转换目录下所有 `.md` 文件。
 - `OUTPUT_DIR` 省略时，PDF 写入源 Markdown 所在目录。
 - `OUTPUT_DIR` 指定时，所有 PDF 直接写入该目录，不保留输入目录结构。
-- 扁平化输出时如出现 PDF 文件名重名，自动修改文件名,避免覆盖。
+- 扁平化输出时如出现 PDF 文件名重名，必须报错并停止。
 
 ## 转换能力
 
-- 基础镜像使用 `debian:bookworm-slim`。
-- 镜像名约定为 `md2pdf:版本号，并加上标签latest`。
+- 基础镜像使用 `debian:trixie-slim`；如需旧稳定版可在构建时覆盖 `DEBIAN_CODENAME`。
+- 镜像名约定为 `md2pdf:latest`，项目版本记录在 `VERSION`。
 - 使用 Pandoc + XeLaTeX 生成 PDF。
 - 安装中文 TeX、Noto CJK 字体和 `lmodern`。
 - 正文字体为 `Noto Serif CJK SC`，无衬线字体为 `Noto Sans CJK SC`。
@@ -29,8 +28,8 @@
 - 上、下、外侧边距为 0 cm，内侧边距为 3 cm。
 - 页脚居中显示页码，格式为 `当前页 / 总页数`。
 - Markdown 中的相对图片路径以源文件所在目录为基准解析。
-- 支持普通 `mermaid` 代码围栏，转换前预渲染为高清 PNG 图片后嵌入 PDF。
-- 运行容器时不得下载任何内容，包括：字体、浏览器、npm 包或 TeX 包。
+- 支持普通 `mermaid` 代码围栏，转换前预渲染为高清 PNG 图片后嵌入 PDF；Mermaid CLI 版本在 Dockerfile 中显式固定。
+- 运行容器时不得下载字体、浏览器、npm 包或 TeX 包。
 
 ## 安全约束
 
@@ -41,6 +40,7 @@
 
 ## 交付物
 
+- `VERSION`
 - `Dockerfile`
 - `md2pdf.sh`
 - `docker/convert.sh`

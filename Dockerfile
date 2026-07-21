@@ -1,4 +1,11 @@
-FROM debian:bookworm-slim
+ARG DEBIAN_CODENAME=trixie
+ARG MERMAID_CLI_VERSION=11.16.0
+FROM debian:${DEBIAN_CODENAME}-slim
+
+ARG MERMAID_CLI_VERSION
+LABEL org.opencontainers.image.title="md2pdf" \
+      org.opencontainers.image.version="1.2.0" \
+      org.opencontainers.image.description="Offline Markdown to PDF converter with Pandoc, XeLaTeX and Mermaid"
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
@@ -22,7 +29,7 @@ RUN apt-get update \
       texlive-lang-chinese \
       texlive-latex-extra \
       texlive-xetex \
-    && npm install -g @mermaid-js/mermaid-cli \
+    && npm install -g "@mermaid-js/mermaid-cli@${MERMAID_CLI_VERSION}" \
     && apt-get purge -y --auto-remove npm \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /root/.cache /tmp/*

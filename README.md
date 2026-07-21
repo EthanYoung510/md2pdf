@@ -1,6 +1,6 @@
-# md2pdf
+# md2pdf v1.2
 
-`md2pdf` 是一个离线 Markdown 转 PDF Docker 工具：构建阶段把 Pandoc、XeLaTeX、中文字体、Chromium 和 Mermaid CLI 打入镜像；运行阶段禁用网络，只读取 Markdown 和本地资源，输出适合打印的 PDF。
+`md2pdf` 是一个离线 Markdown 转 PDF Docker 工具：构建阶段把 Pandoc、XeLaTeX、中文字体、Chromium 和固定版本 Mermaid CLI 打入镜像；运行阶段禁用网络，只读取 Markdown 和本地资源，输出适合打印的 PDF。
 
 ## 结论：不要用目录管理版本
 
@@ -17,6 +17,7 @@
 
 ```text
 .
+├── VERSION                 # 项目版本
 ├── Dockerfile              # 离线运行镜像定义
 ├── md2pdf.sh               # 宿主机入口脚本
 ├── docker/convert.sh       # 容器内转换脚本
@@ -31,6 +32,12 @@
 
 ```bash
 docker build -t md2pdf:latest .
+```
+
+默认基础镜像为 Debian trixie slim。需要复用旧稳定版时可覆盖构建参数：
+
+```bash
+docker build --build-arg DEBIAN_CODENAME=bookworm -t md2pdf:latest .
 ```
 
 ## 使用
@@ -76,15 +83,24 @@ docker build -t md2pdf:latest .
 - `README.md`：描述项目架构、使用方式和维护建议。
 - `material.md`：作为技术培训材料，解释 Docker、Pandoc、XeLaTeX、Mermaid 等技术。
 
+不建议把产品规格全部塞进 `prompt.md`，否则人类读需求和 AI 读流程会互相干扰。
+
 
 ## 清理策略
 
 仓库只保留源代码、产品规格、维护提示词、培训材料和明确要求交付的 `material.pdf`。普通转换输出属于生成物，默认由 `.gitignore` 忽略；Docker 构建上下文通过 `.dockerignore` 排除 Git 元数据、文档和 PDF，避免把无关文件发送进镜像构建过程。
 
+## 进一步建议
+
+- 增加 `tests/fixtures/`：覆盖中文、相对图片、Mermaid、目录递归和扁平化重名冲突。
+- 增加 smoke test：在有 Docker 的环境中执行 `docker build -t md2pdf:latest .` 和一次真实转换。
+- Mermaid CLI 已固定版本；后续升级时先查官方 npm 版本和 Chromium/Puppeteer 兼容性，再修改 Dockerfile。
+- 重新生成 `material.pdf`：在真实 Docker 环境中用本项目脚本从 `material.md` 生成，避免手工或环境替代产物。
+- 考虑拆出 `examples/`：放最小 Markdown、图片和 Mermaid 样例，方便人工验收。
 
 ## AI 迭代建议
 
-人工触发 AI 迭代时，让 AI 直接修改当前工作树并提交到分支。每次迭代应：
+人工触发 AI 迭代时，让 AI 直接修改当前工作树并提交到分支。不要让 AI 复制 `current/` 或维护 `pending/` 目录。每次迭代应：
 
 1. 阅读 `prompt.md`、`SPEC.md`、`README.md`、`material.md` 和相关脚本。
 2. 如涉及最新版本或安全事实，查询官方资料。

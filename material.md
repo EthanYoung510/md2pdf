@@ -12,7 +12,7 @@
 
 Docker 镜像把操作系统包、字体、浏览器、Node 工具、TeX 发行版和转换脚本封装为同一运行环境。离线运行的核心原则是：构建阶段可以下载依赖，运行阶段不得下载依赖。这样可以让转换行为可复现，并减少运行时供应链风险。
 
-本项目镜像基于 `debian:bookworm-slim`，预装 Pandoc、XeLaTeX、中文 TeX、Noto CJK 字体、Chromium 与 Mermaid CLI。宿主机脚本用 `--network none` 禁止运行时网络访问，用 `--read-only` 限制根文件系统写入，并仅开放受限 `tmpfs` 和输出目录。
+本项目 v1.2 默认镜像基于 `debian:trixie-slim`，预装 Pandoc、XeLaTeX、中文 TeX、Noto CJK 字体、Chromium 与固定版本 Mermaid CLI。宿主机脚本用 `--network none` 禁止运行时网络访问，用 `--read-only` 限制根文件系统写入，并仅开放受限 `tmpfs` 和输出目录。
 
 ## 3. Pandoc 文档转换模型
 
@@ -53,9 +53,9 @@ Mermaid CLI 使用 Puppeteer 驱动 Chromium。由于容器以只读根文件系
 
 ## 7. 维护风险清单
 
-- Debian 基础镜像升级可能改变包名或 Chromium 行为。
+- Debian 基础镜像升级可能改变包名或 Chromium 行为；升级前必须查官方发行信息。
 - Pandoc 模板变量变化可能影响 LaTeX 输出。
 - TeX Live 宏包变化可能影响页脚、字体或 geometry 配置。
-- Mermaid CLI 和 Chromium 的版本耦合可能导致渲染参数失效。
+- Mermaid CLI 和 Chromium 的版本耦合可能导致渲染参数失效；CLI 版本应显式固定并逐次升级。
 - Docker 安全参数过严可能影响 Chromium 或 TeX 临时文件写入。
 - 运行阶段联网会破坏离线可复现和供应链边界。
