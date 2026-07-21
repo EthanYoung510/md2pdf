@@ -19,7 +19,7 @@ AI 迭代必须直接面向当前工作树，避免创建 `history/`、`current/
 
 ## 每次迭代必须执行
 
-1. 阅读 `prompt.md`、`SPEC.md`、`README.md`、`material.md` 和相关脚本。
+1. 阅读 `prompt.md`、`SPEC.md`、`README.md` 和相关脚本。
 2. 如问题涉及最新软件版本、安全规则、包名或 Docker 行为，必须查询官方资料。
 3. 保持运行阶段离线：不得在容器运行时下载字体、浏览器、npm 包或 TeX 包。
 4. 优先精简项目结构；代码可以短，但行为必须可靠。
