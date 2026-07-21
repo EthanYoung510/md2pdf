@@ -44,11 +44,10 @@
 - `VERSION`
 - `Dockerfile`
 - `md2pdf.sh`
-- `build.sh`
+- `build.sh` 需要同时打 `md2pdf:latest` 和 `md2pdf:<VERSION>` tag
 - `docker/convert.sh`
 - `README.md`
 - `SPEC.md`
-- build 脚本，需要同时打 `md2pdf:latest` 和 `md2pdf:<VERSION>` tag
 - 项目评价和超出需求的建议 `suggest.md`
 - 更新后的 `prompt.md`
 - 技术培训教材 `material.md`
