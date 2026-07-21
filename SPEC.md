@@ -26,7 +26,7 @@
 - 安装主流字体。
 - 正文字体为 `Noto Serif CJK SC`，无衬线字体为 `Noto Sans CJK SC`。
 - 默认页面为 A4、12pt。
-- 上、下、外侧边距为 0 cm，内侧边距为 3 cm。
+- 上、下、外侧边距为 1 cm，内侧边距为 2 cm。
 - 页脚居中显示页码，格式为 `当前页 / 总页数`。
 - Markdown 中的相对图片路径以源文件所在目录为基准解析。
 - 支持普通 `mermaid` 代码围栏，转换前预渲染为高清 PNG 图片后嵌入 PDF；Mermaid CLI 版本在 Dockerfile 中显式固定。
