@@ -2,7 +2,7 @@
 
 ## 目标
 
-构建一个可在离线运行阶段使用的 Docker 工具，把 Markdown 转换为适合打印的 PDF，并提供宿主机入口脚本 `md2pdf.sh`。
+构建一个可在离线运行阶段使用的 Docker 工具，把 Markdown 转换为适合打印的 PDF，并提供宿主机入口脚本 `md2pdf.sh`,和build脚本。
 
 ## 命令行
 
@@ -23,6 +23,7 @@
 - 镜像名约定为 `md2pdf:latest`，项目版本记录在 `VERSION`。
 - 使用 Pandoc + XeLaTeX 生成 PDF。
 - 安装中文 TeX、Noto CJK 字体、`lmodern` 和 TeX 推荐字体包，避免 XeTeX/hyperref 缺少 `pzdr` 等基础 PostScript 字体。
+- 安装主流字体。
 - 正文字体为 `Noto Serif CJK SC`，无衬线字体为 `Noto Sans CJK SC`。
 - 默认页面为 A4、12pt。
 - 上、下、外侧边距为 0 cm，内侧边距为 3 cm。
