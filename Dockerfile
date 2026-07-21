@@ -4,7 +4,7 @@ FROM debian:${DEBIAN_CODENAME}-slim
 
 ARG MERMAID_CLI_VERSION
 LABEL org.opencontainers.image.title="md2pdf" \
-      org.opencontainers.image.version="1.2.1" \
+      org.opencontainers.image.version="1.3" \
       org.opencontainers.image.description="Offline Markdown to PDF converter with Pandoc, XeLaTeX and Mermaid"
 
 ENV DEBIAN_FRONTEND=noninteractive \
