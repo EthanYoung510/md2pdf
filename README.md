@@ -1,49 +1,31 @@
-# md2pdf 自强化项目
+# md2pdf
 
-本仓库是一个由人工触发、AI 执行迭代的 Markdown 转 PDF 离线工具项目。根目录只保留项目治理入口、总览文档和培训材料；可运行代码、历史快照和待审批方案分别放在独立目录中，降低人工维护成本。
+`md2pdf` 是一个离线 Markdown 转 PDF Docker 工具：构建阶段把 Pandoc、XeLaTeX、中文字体、Chromium 和 Mermaid CLI 打入镜像；运行阶段禁用网络，只读取 Markdown 和本地资源，输出适合打印的 PDF。
 
-## 目录架构
+## 结论：不要用目录管理版本
+
+本项目不再使用 `history/`、`current/`、`pending/` 这类目录表达版本状态。原因很简单：Git 已经提供提交历史、分支、标签和 PR 审批；再用目录复制版本，会导致重复代码、过期文档、构建入口混乱和 AI 修改范围扩大。
+
+推荐模型：
+
+- 历史版本：使用 Git commit、tag、release notes。
+- 现行版本：仓库根目录就是当前版本。
+- 待审批版本：使用 branch / PR / issue，而不是提交到 `pending/` 目录。
+- 决策记录：只在需要时写入 `docs/adr/`，避免复制整套项目。
+
+## 项目结构
 
 ```text
 .
-├── prompt.md              # AI 迭代总提示词：定义人工触发、自检、升级和审批规则
-├── README.md              # 本文件：项目架构、工作流和使用说明
-├── material.md            # 所用技术培训材料
-├── md2pdf.sh              # 根入口薄封装，转发到 current/md2pdf.sh
-├── current/               # 现行版本：当前可运行实现
-│   ├── Dockerfile
-│   ├── md2pdf.sh
-│   ├── docker/convert.sh
-│   ├── requirements.md
-│   └── material.pdf
-├── history/               # 历史版本：已归档的需求、说明和实现快照
-│   └── v1.1/
-└── pending/               # 待审批版本：AI 生成但尚未人工确认的下一版方案
-    └── v-next/
+├── Dockerfile              # 离线运行镜像定义
+├── md2pdf.sh               # 宿主机入口脚本
+├── docker/convert.sh       # 容器内转换脚本
+├── SPEC.md                 # 产品规格：功能、版式、安全和交付要求
+├── prompt.md               # AI 迭代提示词：维护流程和约束
+├── README.md               # 架构、使用和维护说明
+├── material.md             # 技术培训材料
+└── material.pdf            # 培训材料 PDF 交付物
 ```
-
-## 三段式版本区
-
-- `history/`：存放已经完成或被替换的版本资料，用于回溯、对比和审计。
-- `current/`：存放现行可用版本，根入口 `./md2pdf.sh` 会调用这里的实现。
-- `pending/`：存放 AI 在一次迭代中生成的候选方案、风险说明和待审批清单。人工确认后，候选内容再合并到 `current/`，旧现行版本归档到 `history/`。
-
-## 使用现行版本
-
-构建镜像：
-
-```bash
-cd current
-docker build -t md2pdf:latest .
-```
-
-转换文档：
-
-```bash
-./md2pdf.sh [INPUT] [OUTPUT_DIR]
-# md2pdf
-
-离线 Markdown 转 PDF Docker 工具。运行阶段禁用网络，使用 Pandoc、XeLaTeX、Noto CJK 字体和预装的 Mermaid CLI 生成适合打印的 PDF。
 
 ## 构建镜像
 
@@ -57,52 +39,27 @@ docker build -t md2pdf:latest .
 ./md2pdf.sh [INPUT] [OUTPUT_DIR]
 ```
 
-示例：
-
-```bash
-./md2pdf.sh README.md
-./md2pdf.sh docs dist-pdf
-./md2pdf.sh
-```
-
 规则：
 
-- `INPUT` 默认为当前目录。
-- 文件输入只接受 `.md`。
-- 目录输入会递归转换所有 `.md`。
-- 不指定 `OUTPUT_DIR` 时，PDF 写在源 Markdown 同目录。
-- 指定 `OUTPUT_DIR` 时，所有 PDF 扁平写入该目录；同名冲突会报错。
-- 相对图片路径按源 Markdown 所在目录解析。
+- `INPUT` 省略时默认为当前目录。
+- `INPUT` 是 `.md` 文件时生成同名 `.pdf`。
+- `INPUT` 是目录时递归转换全部 `.md` 文件。
+- 省略 `OUTPUT_DIR` 时，PDF 写入源 Markdown 同目录。
+- 指定 `OUTPUT_DIR` 时，所有 PDF 扁平写入该目录；如果不同源文件生成同名 PDF，脚本会报错退出。
+- Markdown 中的相对图片路径以源文件所在目录为基准解析。
 
-## 人工触发 AI 迭代流程
+## 转换链路
 
-1. 人工在 issue、PR 或对话中触发：`根据 prompt.md 迭代项目`。
-2. AI 阅读根目录 `prompt.md`、`current/requirements.md`、`README.md` 和 `material.md`。
-3. AI 检查上游软件版本、官方文档和安全变化，并在 `pending/v-next/` 生成候选方案。
-4. AI 执行可用测试；环境限制必须记录为 warning。
-5. 人工审批后，AI 将 `current/` 归档到 `history/`，把已批准候选合并为新的 `current/`。
+1. 宿主机脚本解析输入文件列表和输出路径。
+2. Docker 以禁网、只读根文件系统和受限临时目录启动容器。
+3. 容器脚本扫描普通 `mermaid` 代码围栏。
+4. Mermaid CLI 通过 Chromium 把图渲染为高清 PNG。
+5. Pandoc 调用 XeLaTeX，把处理后的 Markdown 转成 PDF。
+6. LaTeX header 设置 Noto CJK 字体、A4、12pt、内侧 3cm 边距和 `当前页 / 总页数` 页脚。
 
-## 安全与离线原则
+## 安全边界
 
-现行版本在运行容器时默认使用：
-- 不指定 `OUTPUT_DIR` 时，PDF 写在源文件目录。
-- 指定 `OUTPUT_DIR` 时，所有 PDF 扁平写入该目录；同名冲突会报错。
-- 相对图片路径按源 Markdown 所在目录解析。
-
-## Mermaid
-
-普通代码围栏会在容器内预渲染为高清 PNG：
-
-````markdown
-```mermaid
-flowchart LR
-  A[Markdown] --> B[PDF]
-```
-````
-
-## 安全默认值
-
-`md2pdf.sh` 使用以下 Docker 运行参数：
+运行容器默认使用：
 
 - `--network none`
 - `--read-only`
@@ -111,3 +68,23 @@ flowchart LR
 - `--security-opt no-new-privileges`
 
 构建阶段可以联网安装依赖；运行阶段不得下载字体、浏览器、npm 包或 TeX 包。
+
+## 文档职责
+
+- `SPEC.md`：描述产品必须满足什么，包括输入输出、PDF 版式、离线和安全要求。
+- `prompt.md`：描述 AI 应该如何维护项目，包括查资料、改代码、测试、提交和创建 PR。
+- `README.md`：描述项目架构、使用方式和维护建议。
+- `material.md`：作为技术培训材料，解释 Docker、Pandoc、XeLaTeX、Mermaid 等技术。
+
+不建议把产品规格全部塞进 `prompt.md`，否则人类读需求和 AI 读流程会互相干扰。
+
+## AI 迭代建议
+
+人工触发 AI 迭代时，让 AI 直接修改当前工作树并提交到分支。不要让 AI 复制 `current/` 或维护 `pending/` 目录。每次迭代应：
+
+1. 阅读 `prompt.md`、`SPEC.md`、`README.md`、`material.md` 和相关脚本。
+2. 如涉及最新版本或安全事实，查询官方资料。
+3. 修改根目录当前实现。
+4. 更新 README / material / SPEC。
+5. 运行可用测试。
+6. 提交 commit，并通过 PR 让人工审批。
