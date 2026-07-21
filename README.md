@@ -2,10 +2,6 @@
 
 `md2pdf` 是一个离线 Markdown 转 PDF Docker 工具：构建阶段把 Pandoc、XeLaTeX、中文字体、TeX 推荐字体、Chromium 和固定版本 Mermaid CLI 打入镜像；运行阶段禁用网络，只读取 Markdown 和本地资源，输出适合打印的 PDF。
 
-## 结论：不要用目录管理版本
-
-本项目不再使用 `history/`、`current/`、`pending/` 这类目录表达版本状态。原因很简单：Git 已经提供提交历史、分支、标签和 PR 审批；再用目录复制版本，会导致重复代码、过期文档、构建入口混乱和 AI 修改范围扩大。
-
 推荐模型：
 
 - 历史版本：使用 Git commit、tag、release notes。

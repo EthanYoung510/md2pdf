@@ -46,6 +46,7 @@
 - `docker/convert.sh`
 - `README.md`
 - `SPEC.md`
+- build 脚本,需要tag版本号
+- 项目评价和超出需求的建议 `suggest.md`
 - 更新后的 `prompt.md`
 - 技术培训教材 `material.md`
-- 由项目脚本生成的 `material.pdf`
