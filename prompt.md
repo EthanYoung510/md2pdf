@@ -39,7 +39,7 @@ AI 迭代必须直接面向当前工作树
 - 指定 `OUTPUT_DIR` 时扁平输出，重名必须报错。
 - Markdown 相对图片以源文件所在目录为基准。
 - 基础镜像：默认 `debian:trixie-slim`，构建参数 `DEBIAN_CODENAME` 可覆盖。
-- 镜像名：`md2pdf:latest`；项目版本记录在 `VERSION`。
+- 镜像名：`md2pdf:latest`；项目版本记录在 `VERSION`；构建脚本必须同时打 `latest` 和版本号 tag。
 - PDF 引擎：Pandoc + XeLaTeX。
 - 字体：`Noto Serif CJK SC`、`Noto Sans CJK SC`、`lmodern`、`texlive-fonts-recommended`。
 - 页面：A4、12pt、上/下/外侧 0 cm、内侧 3 cm。

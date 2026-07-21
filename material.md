@@ -12,7 +12,7 @@
 
 Docker 镜像把操作系统包、字体、浏览器、Node 工具、TeX 发行版和转换脚本封装为同一运行环境。离线运行的核心原则是：构建阶段可以下载依赖，运行阶段不得下载依赖。这样可以让转换行为可复现，并减少运行时供应链风险。
 
-本项目 v1.2.1 默认镜像基于 `debian:trixie-slim`，预装 Pandoc、XeLaTeX、中文 TeX、Noto CJK 字体、TeX 推荐字体、Chromium 与固定版本 Mermaid CLI。宿主机脚本用 `--network none` 禁止运行时网络访问，用 `--read-only` 限制根文件系统写入，并仅开放受限 `tmpfs` 和输出目录。
+本项目 v1.3 默认镜像基于 `debian:trixie-slim`，预装 Pandoc、XeLaTeX、中文 TeX、Noto CJK 字体、TeX 推荐字体、Chromium 与固定版本 Mermaid CLI。宿主机脚本用 `--network none` 禁止运行时网络访问，用 `--read-only` 限制根文件系统写入，并仅开放受限 `tmpfs` 和输出目录。
 
 ## 3. Pandoc 文档转换模型
 
@@ -59,3 +59,9 @@ Mermaid CLI 使用 Puppeteer 驱动 Chromium。由于容器以只读根文件系
 - Mermaid CLI 和 Chromium 的版本耦合可能导致渲染参数失效；CLI 版本应显式固定并逐次升级。
 - Docker 安全参数过严可能影响 Chromium 或 TeX 临时文件写入。
 - 运行阶段联网会破坏离线可复现和供应链边界。
+
+## 8. 构建脚本与版本 tag
+
+`build.sh` 将镜像构建入口固化为项目交付物。脚本读取根目录 `VERSION`，默认构建 `md2pdf:latest`，并额外打 `md2pdf:<VERSION>` tag。这样可以同时满足日常使用的稳定镜像名和版本追溯需求。
+
+脚本保留 `DEBIAN_CODENAME` 与 `MERMAID_CLI_VERSION` 环境变量覆盖能力，让维护者可以在不修改脚本的情况下验证 Debian 基础镜像或 Mermaid CLI 升级；但运行阶段仍必须坚持禁网和不下载依赖。
