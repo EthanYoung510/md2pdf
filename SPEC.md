@@ -1,4 +1,4 @@
-# md2pdf 产品规格 v1.3
+# md2pdf 产品规格 v1.4
 
 ## 目标
 
@@ -19,14 +19,14 @@
 
 ## 转换能力
 
-- 基础镜像使用 `debian:trixie-slim`；如需旧稳定版可在构建时覆盖 `DEBIAN_CODENAME`。
+- 基础镜像使用 Pandoc 官方 Ubuntu 变体，固定为 `pandoc/extra:3.10.0-ubuntu`。
 - 镜像名约定为 `md2pdf:latest`，项目版本记录在 `VERSION`。
 - 使用 Pandoc + XeLaTeX 生成 PDF。
-- 安装中文 TeX、Noto CJK 字体、`lmodern` 和 TeX 推荐字体包，避免 XeTeX/hyperref 缺少 `pzdr` 等基础 PostScript 字体。
+- 使用官方镜像中的 TeX Live、`lmodern` 和推荐字体，额外安装 Noto CJK 系统字体；构建时校验 `zref-lastpage` 和 `pzdr`。
 - 安装主流字体。
 - 正文字体为 `Noto Serif CJK SC`，无衬线字体为 `Noto Sans CJK SC`。
 - 默认页面为 A4、12pt。
-- 上、下、外侧边距为 1 cm，内侧边距为 2 cm。
+- 上、下、外侧边距为 0 cm，内侧边距为 3 cm。
 - 页脚居中显示页码，格式为 `当前页 / 总页数`。
 - Markdown 中的相对图片路径以源文件所在目录为基准解析。
 - 支持普通 `mermaid` 代码围栏，转换前预渲染为高清 PNG 图片后嵌入 PDF；Mermaid CLI 版本在 Dockerfile 中显式固定。
@@ -49,5 +49,7 @@
 - `README.md`
 - `SPEC.md`
 - 项目评价和超出需求的建议 `suggest.md`
-- 更新后的 `prompt.md`
+- AI 维护约束 `AGENTS.md`
 - 技术培训教材 `material.md`
+- 依赖和已验证平台记录 `RELEASE_NOTES.md`
+- GitHub Actions Docker smoke test，必须执行真实镜像构建和最小 PDF 转换

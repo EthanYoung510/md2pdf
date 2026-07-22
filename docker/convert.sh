@@ -68,14 +68,15 @@ cat > "$workdir/header.tex" <<'EOF_TEX'
 \usepackage{fontspec}
 \usepackage{xeCJK}
 \usepackage{fancyhdr}
-\usepackage{lastpage}
+\usepackage{zref-lastpage}
+\usepackage{zref-user}
 \setmainfont{Noto Serif CJK SC}
 \setsansfont{Noto Sans CJK SC}
 \setCJKmainfont{Noto Serif CJK SC}
 \setCJKsansfont{Noto Sans CJK SC}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyfoot[C]{\thepage{} / \pageref{LastPage}}
+\fancyfoot[C]{\thepage{} / \zpageref{LastPage}}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
 EOF_TEX
@@ -88,10 +89,10 @@ pandoc "$processed" \
   --resource-path="$srcdir:$workdir" \
   --metadata papersize=a4 \
   --metadata fontsize=12pt \
-  --variable geometry:top=1cm \
-  --variable geometry:bottom=1cm \
-  --variable geometry:inner=2cm \
-  --variable geometry:outer=1cm \
+  --variable geometry:top=0cm \
+  --variable geometry:bottom=0cm \
+  --variable geometry:inner=3cm \
+  --variable geometry:outer=0cm \
   --variable classoption=twoside \
   --include-in-header="$workdir/header.tex" \
   --output "$output"
