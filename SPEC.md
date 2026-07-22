@@ -19,15 +19,15 @@
 
 ## 转换能力
 
-- 基础镜像使用 Pandoc 官方 Ubuntu 变体，固定为 `pandoc/extra:3.10.0-ubuntu`。
+- 基础镜像使用 Pandoc 官方 Ubuntu 变体
 - 镜像名约定为 `md2pdf:latest`，项目版本记录在 `VERSION`。
 - 使用 Pandoc + XeLaTeX 生成 PDF。
 - 使用官方镜像中的 TeX Live、`lmodern` 和推荐字体，额外安装 Noto CJK 系统字体；构建时校验 `zref-lastpage` 和 `pzdr`。
 - 安装主流字体。
 - 正文字体为 `Noto Serif CJK SC`，无衬线字体为 `Noto Sans CJK SC`。
 - 默认页面为 A4、12pt。
-- 上、下、外侧边距为 0 cm，内侧边距为 3 cm。
-- 页脚居中显示页码，格式为 `当前页 / 总页数`。
+- 上、下、内侧边距为 2 cm，外侧边距为 1 cm。
+- 页脚外侧显示页码，格式为 `当前页 / 总页数`。
 - Markdown 中的相对图片路径以源文件所在目录为基准解析。
 - 支持普通 `mermaid` 代码围栏，转换前预渲染为高清 PNG 图片后嵌入 PDF；Mermaid CLI 版本在 Dockerfile 中显式固定。
 - 运行容器时不得下载字体、浏览器、npm 包或 TeX 包。
