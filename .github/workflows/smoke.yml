@@ -1,0 +1,40 @@
+name: smoke
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  docker-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Build versioned image
+        run: ./build.sh
+
+      - name: Convert minimal Markdown with Mermaid
+        run: |
+          mkdir -p "${RUNNER_TEMP}/md2pdf-smoke/input" "${RUNNER_TEMP}/md2pdf-smoke/output"
+          printf '# Smoke test\n\n中文排版\n\n```mermaid\nflowchart LR\n  A --> B\n```\n' \
+            > "${RUNNER_TEMP}/md2pdf-smoke/input/smoke.md"
+          ./md2pdf.sh \
+            "${RUNNER_TEMP}/md2pdf-smoke/input/smoke.md" \
+            "${RUNNER_TEMP}/md2pdf-smoke/output"
+          test -s "${RUNNER_TEMP}/md2pdf-smoke/output/smoke.pdf"
+          file "${RUNNER_TEMP}/md2pdf-smoke/output/smoke.pdf" | grep -F 'PDF document'
+
+      - name: Verify image tags and runtime security flags
+        run: |
+          docker image inspect md2pdf:latest >/dev/null
+          docker image inspect "md2pdf:$(tr -d '[:space:]' < VERSION)" >/dev/null
+          grep -F -- '--network none' md2pdf.sh
+          grep -F -- '--read-only' md2pdf.sh
+          grep -F -- '--tmpfs /tmp:rw,nosuid,nodev,noexec,size=512m' md2pdf.sh
+          grep -F -- '--tmpfs /run:rw,nosuid,nodev,noexec,size=64m' md2pdf.sh
+          grep -F -- '--security-opt no-new-privileges' md2pdf.sh

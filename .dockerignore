@@ -3,7 +3,8 @@
 .dockerignore
 README.md
 SPEC.md
-prompt.md
+AGENTS.md
+RELEASE_NOTES.md
 material.md
 material.pdf
 *.pdf
