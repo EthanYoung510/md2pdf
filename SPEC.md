@@ -1,4 +1,4 @@
-# md2pdf 产品规格 v1.4
+# md2pdf 产品规格
 
 ## 目标
 
@@ -20,7 +20,9 @@
 ## 转换能力
 
 - 基础镜像使用 Pandoc 官方 Ubuntu 变体
-- 镜像名约定为 `md2pdf:latest`，项目版本记录在 `VERSION`。
+- 默认构建目标平台为 `linux/amd64`，在 ARM 宿主机上使用 Docker 平台模拟。
+- `VERSION` 是项目版本的唯一真源，只包含不带 `v` 前缀的 `MAJOR.MINOR.PATCH` 发布版本号。
+- 镜像名约定为 `md2pdf:latest`；构建时还必须生成 `md2pdf:<VERSION>`，并把相同版本写入 OCI `org.opencontainers.image.version` label。
 - 使用 Pandoc + XeLaTeX 生成 PDF。
 - 使用官方镜像中的 TeX Live、`lmodern` 和推荐字体，额外安装 Noto CJK 系统字体；构建时校验 `zref-lastpage` 和 `pzdr`。
 - 安装主流字体。
@@ -44,7 +46,7 @@
 - `VERSION`
 - `Dockerfile`
 - `md2pdf.sh`
-- `build.sh` 需要同时打 `md2pdf:latest` 和 `md2pdf:<VERSION>` tag
+- `build.sh` 需要校验 `VERSION`，同时打 `md2pdf:latest` 和 `md2pdf:<VERSION>` tag，并写入一致的 OCI version label
 - `docker/convert.sh`
 - `README.md`
 - `SPEC.md`

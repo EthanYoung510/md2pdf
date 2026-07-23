@@ -1,4 +1,4 @@
-# md2pdf v1.4
+# md2pdf
 
 `md2pdf` 是一个离线 Markdown 转 PDF Docker 工具：以固定版本的 Pandoc 官方 Ubuntu 镜像为基础，在构建阶段加入中文字体、Mermaid CLI 和 Puppeteer 配套浏览器；运行阶段禁用网络，只读取 Markdown 和本地资源，输出适合打印的 PDF。
 
@@ -13,7 +13,7 @@
 
 ```text
 .
-├── VERSION                 # 项目版本
+├── VERSION                 # 项目版本的唯一真源
 ├── Dockerfile              # 离线运行镜像定义
 ├── md2pdf.sh               # 宿主机入口脚本
 ├── build.sh                # 镜像构建脚本，同时打 latest 和版本号 tag
@@ -33,9 +33,9 @@
 ./build.sh
 ```
 
-构建脚本会读取 `VERSION`，并同时打 `md2pdf:latest` 与 `md2pdf:<VERSION>` 两个 tag。
+构建脚本会校验并读取 `VERSION`，同时打 `md2pdf:latest` 与 `md2pdf:<VERSION>` 两个 tag，并把相同版本写入镜像的 OCI version label。
 
-构建前脚本会拉取固定的 `pandoc/extra:3.10.0-ubuntu`，再同时生成 `md2pdf:latest` 和 `md2pdf:1.4`。如需手工查看 Pandoc 官方当前 Ubuntu 镜像，可执行：
+构建前脚本会为 `linux/amd64` 拉取固定的 `pandoc/extra:3.10.0-ubuntu`，再同时生成 `md2pdf:latest` 和版本化镜像。如需手工查看 Pandoc 官方当前 Ubuntu 镜像，可执行：
 
 ```bash
 docker pull pandoc/extra:latest-ubuntu
@@ -43,7 +43,25 @@ docker pull pandoc/extra:latest-ubuntu
 
 项目不直接使用浮动的 `latest-ubuntu` 构建，而是固定到当前已验证版本。如需评估新版，可显式覆盖 `PANDOC_BASE_IMAGE`，但应在验证后同步更新默认值和发布记录。
 
-Mermaid 的 Chrome for Testing 官方 Linux 二进制仅支持 amd64，因此 v1.4 镜像构建平台限定为 Linux amd64；不支持的架构会在构建时立即失败。
+Mermaid 的 Chrome for Testing 官方 Linux 二进制仅支持 amd64，因此当前镜像构建平台限定为 `linux/amd64`。`build.sh` 会显式向 Docker 的 pull 和 build 传入该平台，在 Apple Silicon 等 ARM 宿主机上使用 Docker 提供的平台模拟；维护者可用 `MD2PDF_PLATFORM` 做显式兼容性试验，但发布值保持 `linux/amd64`。
+
+## 版本与发布
+
+`VERSION` 只保存不带 `v` 前缀的 `MAJOR.MINOR.PATCH` 发布版本号，例如 `2.3.4`。它是项目版本的唯一真源；README、SPEC 和 Dockerfile 不再硬编码当前项目版本。
+
+- 兼容性缺陷修复增加 PATCH。
+- 向后兼容的新功能增加 MINOR，并把 PATCH 归零。
+- 不兼容的命令行或输出行为变更增加 MAJOR，并把 MINOR、PATCH 归零。
+
+发布前更新 `VERSION` 和 `RELEASE_NOTES.md`，测试并合并变更，再创建 annotated tag：
+
+```bash
+version=$(<VERSION)
+git tag -a "v${version}" -m "md2pdf v${version}"
+git push origin "v${version}"
+```
+
+GitHub Actions 会在 tag 构建时检查 tag 是否严格等于 `v<VERSION>`。`latest` 是方便日常使用的可变 tag；`md2pdf:<VERSION>` 和 Git tag 用于不可变版本追溯。
 
 ## 使用
 
@@ -67,7 +85,7 @@ Mermaid 的 Chrome for Testing 官方 Linux 二进制仅支持 amd64，因此 v1
 3. 容器脚本扫描普通 `mermaid` 代码围栏。
 4. Mermaid CLI 通过 Puppeteer 配套的 Chrome for Testing 把图渲染为高清 PNG。
 5. Pandoc 调用 XeLaTeX，把处理后的 Markdown 转成 PDF。
-6. LaTeX header 设置 Noto CJK 字体、A4、12pt、内侧 3cm 边距和 `当前页 / 总页数` 页脚。
+6. LaTeX header 设置 Noto CJK 字体、A4、12pt、上/下/内侧 2 cm、外侧 1 cm，并在页脚外侧显示 `当前页 / 总页数`。
 
 ## 安全边界
 
@@ -86,7 +104,7 @@ Mermaid 的 Chrome for Testing 官方 Linux 二进制仅支持 amd64，因此 v1
 
 ### `Font \XeTeXLink@font=pzdr ... not loadable`
 
-该错误表示 XeTeX/hyperref 需要 Zapf Dingbats / Base 35 相关 TeX 字体指标。v1.4 直接使用 Pandoc 官方 extra 镜像的 TeX Live，并在构建时用 `kpsewhich` 校验 `pzdr` 和 `zref-lastpage` 页数宏包；校验失败时构建会立即停止。如果仍使用旧镜像，请重新构建：
+该错误表示 XeTeX/hyperref 需要 Zapf Dingbats / Base 35 相关 TeX 字体指标。当前镜像直接使用 Pandoc 官方 extra 镜像的 TeX Live，并在构建时用 `kpsewhich` 校验 `pzdr` 和 `zref-lastpage` 页数宏包；校验失败时构建会立即停止。如果仍使用旧镜像，请重新构建：
 
 ```bash
 ./build.sh

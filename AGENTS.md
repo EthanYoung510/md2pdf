@@ -10,7 +10,9 @@
 
 ## 版本管理原则
 
-- 发布版本：创建 Git tag，并在 release notes 中记录依赖版本和已验证平台。
+- `VERSION` 是项目版本的唯一真源，只保存不带 `v` 前缀的 `MAJOR.MINOR.PATCH` 发布版本号。
+- 构建脚本、镜像版本 tag 和 OCI version label 必须从 `VERSION` 派生，不得在其他文件硬编码项目版本。
+- 发布版本：创建与 `VERSION` 对应的 annotated Git tag `v<VERSION>`，并在 release notes 中记录依赖版本和已验证平台。
 - 历史版本：commit、tag、release。
 - 现行版本：仓库根目录工作树。
 - 待审批版本：branch、PR、issue。
@@ -38,7 +40,7 @@ AI 迭代必须直接面向当前工作树
 - 指定 `OUTPUT_DIR` 时扁平输出，重名必须报错。
 - Markdown 相对图片以源文件所在目录为基准。
 - 基础镜像：固定为 Pandoc 官方 `pandoc/extra:3.10.0-ubuntu`。
-- 镜像名：`md2pdf:latest`；项目版本记录在 `VERSION`；构建脚本必须同时打 `latest` 和版本号 tag。
+- 镜像名：`md2pdf:latest`；项目版本记录在 `VERSION`；构建脚本必须同时打 `latest` 和版本号 tag，并写入一致的 OCI version label。
 - PDF 引擎：Pandoc + XeLaTeX。
 - 字体：`Noto Serif CJK SC`、`Noto Sans CJK SC`、`lmodern`、TeX Live 推荐字体。
 - 页面：A4、12pt、上/下/内侧 2 cm、外侧 1 cm。

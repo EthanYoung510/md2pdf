@@ -16,7 +16,12 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Build versioned image
-        run: ./build.sh
+        run: |
+          version=$(<VERSION)
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            test "${GITHUB_REF_NAME}" = "v${version}"
+          fi
+          ./build.sh
 
       - name: Convert minimal Markdown with Mermaid
         run: |
@@ -31,10 +36,18 @@ jobs:
 
       - name: Verify image tags and runtime security flags
         run: |
+          version=$(<VERSION)
           docker image inspect md2pdf:latest >/dev/null
-          docker image inspect "md2pdf:$(tr -d '[:space:]' < VERSION)" >/dev/null
+          docker image inspect "md2pdf:${version}" >/dev/null
+          test "$(docker image inspect --format '{{ index .Config.Labels "org.opencontainers.image.version" }}' md2pdf:latest)" = "${version}"
+          test "$(docker image inspect --format '{{.Os}}/{{.Architecture}}' md2pdf:latest)" = "linux/amd64"
           grep -F -- '--network none' md2pdf.sh
           grep -F -- '--read-only' md2pdf.sh
           grep -F -- '--tmpfs /tmp:rw,nosuid,nodev,noexec,size=512m' md2pdf.sh
           grep -F -- '--tmpfs /run:rw,nosuid,nodev,noexec,size=64m' md2pdf.sh
           grep -F -- '--security-opt no-new-privileges' md2pdf.sh
+          grep -F -- '--variable geometry:top=2cm' docker/convert.sh
+          grep -F -- '--variable geometry:bottom=2cm' docker/convert.sh
+          grep -F -- '--variable geometry:inner=2cm' docker/convert.sh
+          grep -F -- '--variable geometry:outer=1cm' docker/convert.sh
+          grep -F -- '\fancyfoot[LE,RO]{\thepage{} / \zpageref{LastPage}}' docker/convert.sh

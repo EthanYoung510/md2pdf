@@ -1,13 +1,16 @@
 # Release notes
 
-## v1.4
+## v1.4.0
 
 ### 变更
 
+- 项目版本规范化为 `MAJOR.MINOR.PATCH`，并以单行 `VERSION` 作为唯一真源。
+- 构建脚本从 `VERSION` 派生版本化镜像 tag 和 OCI version label；CI 校验镜像元数据及发布 tag 一致性。
+- 构建脚本显式使用 `linux/amd64` 目标平台，使 ARM 宿主机可通过 Docker 平台模拟构建受 Chrome for Testing 架构限制的镜像。
 - 基础镜像迁移到 Pandoc 官方 Ubuntu 镜像，并固定为 `pandoc/extra:3.10.0-ubuntu`。
 - 增加 GitHub Actions Docker smoke test，真实构建镜像并转换包含中文和 Mermaid 的最小文档。
 - AI 维护约束由 `prompt.md` 迁移到标准的 `AGENTS.md`。
-- 统一打印边距为上/下/外侧 0 cm、内侧 3 cm。
+- 修正规格漂移：打印边距恢复为上/下/内侧 2 cm、外侧 1 cm，页码置于页脚外侧。
 
 ### 固定依赖
 
