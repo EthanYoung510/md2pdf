@@ -1,3 +1,4 @@
+.DS_Store
 .git
 .gitignore
 .dockerignore
@@ -6,5 +7,4 @@ SPEC.md
 AGENTS.md
 RELEASE_NOTES.md
 material.md
-material.pdf
 *.pdf

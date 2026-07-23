@@ -1,5 +1,25 @@
 # Release notes
 
+## v1.4.1
+
+### 变更
+
+- Docker 构建上下文忽略 macOS Finder 生成的 `.DS_Store`。
+- 删除已被全局 `*.pdf` 规则覆盖的冗余 `material.pdf` 忽略项。
+
+### 固定依赖
+
+- Pandoc 官方镜像：`pandoc/extra:3.10.0-ubuntu`（Pandoc 3.10.0）
+- Node.js 官方镜像：`node:22.23.1-bookworm-slim`（仅复制 Node.js 运行时）
+- Mermaid CLI：11.16.0
+- Puppeteer：24.43.1
+- PDF 引擎：Pandoc 官方镜像内置 XeTeX 0.999998 / TeX Live 2026
+- 浏览器：Chrome for Testing 148.0.7778.97（由固定的 Puppeteer 版本选择，仅在构建阶段下载）
+
+### 验证平台
+
+- GitHub Actions `ubuntu-24.04` + Docker：由 `.github/workflows/smoke.yml` 执行完整镜像构建和中文/Mermaid PDF 转换。
+
 ## v1.4.0
 
 ### 变更
