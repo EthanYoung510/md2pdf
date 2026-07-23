@@ -41,6 +41,7 @@ AI 迭代必须直接面向当前工作树
 - Markdown 相对图片以源文件所在目录为基准。
 - 基础镜像：固定为 Pandoc 官方 `pandoc/extra:3.10.0-ubuntu`。
 - 镜像名：`md2pdf:latest`；项目版本记录在 `VERSION`；构建脚本必须同时打 `latest` 和版本号 tag，并写入一致的 OCI version label。
+- 构建目标平台：固定为 `linux/amd64`，使依赖的 Chrome for Testing 在 ARM 宿主机上通过模拟构建。
 - PDF 引擎：Pandoc + XeLaTeX。
 - 字体：`Noto Serif CJK SC`、`Noto Sans CJK SC`、`lmodern`、TeX Live 推荐字体。
 - 页面：A4、12pt、上/下/内侧 2 cm、外侧 1 cm。
