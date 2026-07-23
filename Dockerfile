@@ -6,10 +6,11 @@ ARG PUPPETEER_VERSION=24.43.1
 FROM ${NODE_BASE_IMAGE} AS node-runtime
 FROM ${PANDOC_BASE_IMAGE}
 
+ARG PROJECT_VERSION
 ARG MERMAID_CLI_VERSION
 ARG PUPPETEER_VERSION
 LABEL org.opencontainers.image.title="md2pdf" \
-      org.opencontainers.image.version="1.4" \
+      org.opencontainers.image.version="${PROJECT_VERSION}" \
       org.opencontainers.image.description="Offline Markdown to PDF converter with Pandoc, XeLaTeX and Mermaid"
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -21,6 +22,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     XDG_CONFIG_HOME=/tmp/config
 
 USER root
+
+RUN test -n "${PROJECT_VERSION}"
 
 COPY --from=node-runtime /usr/local/bin/node /usr/local/bin/node
 COPY --from=node-runtime /usr/local/lib/node_modules /usr/local/lib/node_modules
