@@ -25,14 +25,24 @@ jobs:
 
       - name: Convert minimal Markdown with Mermaid
         run: |
-          mkdir -p "${RUNNER_TEMP}/md2pdf-smoke/input" "${RUNNER_TEMP}/md2pdf-smoke/output"
-          printf '# Smoke test\n\n中文排版\n\n```mermaid\nflowchart LR\n  A --> B\n```\n' \
+          mkdir -p \
+            "${RUNNER_TEMP}/md2pdf-smoke/input" \
+            "${RUNNER_TEMP}/md2pdf-smoke/double" \
+            "${RUNNER_TEMP}/md2pdf-smoke/single"
+          printf '# Smoke test\n\n## 中文章节\n\n中文排版\n\n```mermaid\nflowchart LR\n  A --> B\n```\n' \
             > "${RUNNER_TEMP}/md2pdf-smoke/input/smoke.md"
           ./md2pdf.sh \
             "${RUNNER_TEMP}/md2pdf-smoke/input/smoke.md" \
-            "${RUNNER_TEMP}/md2pdf-smoke/output"
-          test -s "${RUNNER_TEMP}/md2pdf-smoke/output/smoke.pdf"
-          file "${RUNNER_TEMP}/md2pdf-smoke/output/smoke.pdf" | grep -F 'PDF document'
+            "${RUNNER_TEMP}/md2pdf-smoke/double"
+          ./md2pdf.sh --single-sided --front-matter \
+            "${RUNNER_TEMP}/md2pdf-smoke/input/smoke.md" \
+            "${RUNNER_TEMP}/md2pdf-smoke/single"
+          for pdf in \
+            "${RUNNER_TEMP}/md2pdf-smoke/double/smoke.pdf" \
+            "${RUNNER_TEMP}/md2pdf-smoke/single/smoke.pdf"; do
+            test -s "${pdf}"
+            file "${pdf}" | grep -F 'PDF document'
+          done
 
       - name: Verify image tags and runtime security flags
         run: |
@@ -48,6 +58,10 @@ jobs:
           grep -F -- '--security-opt no-new-privileges' md2pdf.sh
           grep -F -- '--variable geometry:top=2cm' docker/convert.sh
           grep -F -- '--variable geometry:bottom=2cm' docker/convert.sh
+          grep -F -- '--variable geometry:left=2cm' docker/convert.sh
+          grep -F -- '--variable geometry:right=1cm' docker/convert.sh
           grep -F -- '--variable geometry:inner=2cm' docker/convert.sh
           grep -F -- '--variable geometry:outer=1cm' docker/convert.sh
+          grep -F -- '\fancyfoot[R]{\thepage{} / \zpageref{LastPage}}' docker/convert.sh
           grep -F -- '\fancyfoot[LE,RO]{\thepage{} / \zpageref{LastPage}}' docker/convert.sh
+          grep -F -- '--toc' docker/convert.sh

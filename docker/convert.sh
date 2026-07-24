@@ -2,16 +2,28 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: md2pdf-convert INPUT_MD OUTPUT_PDF" >&2
+  echo "Usage: md2pdf-convert INPUT_MD OUTPUT_PDF [single|double] [true|false]" >&2
 }
 
-if [[ $# -ne 2 ]]; then
+if [[ $# -lt 2 || $# -gt 4 ]]; then
   usage
   exit 64
 fi
 
 input=$1
 output=$2
+print_mode=${3:-double}
+front_matter=${4:-false}
+
+if [[ "$print_mode" != single && "$print_mode" != double ]]; then
+  echo "ERROR: print mode must be single or double: $print_mode" >&2
+  exit 64
+fi
+
+if [[ "$front_matter" != true && "$front_matter" != false ]]; then
+  echo "ERROR: front matter must be true or false: $front_matter" >&2
+  exit 64
+fi
 
 if [[ ! -f "$input" || "${input##*.}" != "md" ]]; then
   echo "ERROR: input must be an existing .md file: $input" >&2
@@ -76,23 +88,77 @@ cat > "$workdir/header.tex" <<'EOF_TEX'
 \setCJKsansfont{Noto Sans CJK SC}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyfoot[LE,RO]{\thepage{} / \zpageref{LastPage}}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
 EOF_TEX
 
+geometry_args=(
+  --variable geometry:top=2cm
+  --variable geometry:bottom=2cm
+)
+class_options=()
 
-pandoc "$processed" \
-  --from markdown+fenced_code_blocks+implicit_figures \
-  --to pdf \
-  --pdf-engine=xelatex \
-  --resource-path="$srcdir:$workdir" \
-  --metadata papersize=a4 \
-  --metadata fontsize=12pt \
-  --variable geometry:top=2cm \
-  --variable geometry:bottom=2cm \
-  --variable geometry:inner=2cm \
-  --variable geometry:outer=1cm \
-  --variable classoption=twoside \
-  --include-in-header="$workdir/header.tex" \
+if [[ "$print_mode" == single ]]; then
+  geometry_args+=(
+    --variable geometry:left=2cm
+    --variable geometry:right=1cm
+  )
+  printf '%s\n' '\fancyfoot[R]{\thepage{} / \zpageref{LastPage}}' >> "$workdir/header.tex"
+else
+  geometry_args+=(
+    --variable geometry:inner=2cm
+    --variable geometry:outer=1cm
+  )
+  class_options+=(twoside)
+  printf '%s\n' '\fancyfoot[LE,RO]{\thepage{} / \zpageref{LastPage}}' >> "$workdir/header.tex"
+fi
+
+pandoc_args=(
+  "$processed"
+  --from markdown+fenced_code_blocks+implicit_figures
+  --to pdf
+  --pdf-engine=xelatex
+  --resource-path="$srcdir:$workdir"
+  --metadata papersize=a4
+  --metadata fontsize=12pt
+  "${geometry_args[@]}"
+  --include-in-header="$workdir/header.tex"
   --output "$output"
+)
+
+if [[ "$front_matter" == true ]]; then
+  cat > "$workdir/front-matter.lua" <<'EOF_LUA'
+function Pandoc(doc)
+  local fallback = doc.meta["md2pdf-fallback-title"]
+  doc.meta["md2pdf-fallback-title"] = nil
+
+  if doc.meta.title then
+    return doc
+  end
+
+  for index, block in ipairs(doc.blocks) do
+    if block.t == "Header" and block.level == 1 then
+      doc.meta.title = pandoc.MetaInlines(block.content)
+      table.remove(doc.blocks, index)
+      return doc
+    end
+  end
+
+  doc.meta.title = fallback
+  return doc
+end
+EOF_LUA
+  class_options+=(titlepage)
+  pandoc_args+=(
+    --lua-filter="$workdir/front-matter.lua"
+    --metadata "md2pdf-fallback-title=$base"
+    --toc
+  )
+fi
+
+if [[ ${#class_options[@]} -gt 0 ]]; then
+  class_option=$(IFS=,; printf '%s' "${class_options[*]}")
+  pandoc_args+=(--variable "classoption=$class_option")
+fi
+
+pandoc "${pandoc_args[@]}"

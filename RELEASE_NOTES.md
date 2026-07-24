@@ -1,5 +1,27 @@
 # Release notes
 
+## v1.5.0
+
+### 变更
+
+- 新增 `--single-sided` 与 `--double-sided` 打印版式选项，默认保持双面打印。
+- 单面版式使用上、下、左侧 2 cm、右侧 1 cm 边距，并把页码固定在右下角。
+- 新增 `--front-matter`，自动生成独立封面和目录；标题依次取 YAML `title`、首个一级标题和文件名。
+- smoke test 同时执行默认双面转换和带封面目录的单面转换。
+
+### 固定依赖
+
+- Pandoc 官方镜像：`pandoc/extra:3.10.0-ubuntu`（Pandoc 3.10.0）
+- Node.js 官方镜像：`node:22.23.1-bookworm-slim`（仅复制 Node.js 运行时）
+- Mermaid CLI：11.16.0
+- Puppeteer：24.43.1
+- PDF 引擎：Pandoc 官方镜像内置 XeTeX 0.999998 / TeX Live 2026
+- 浏览器：Chrome for Testing 148.0.7778.97（由固定的 Puppeteer 版本选择，仅在构建阶段下载）
+
+### 验证平台
+
+- Linux x86_64 + Podman 4.9.4 Docker 兼容层：已验证 `linux/amd64` 完整镜像构建、默认双面转换、带封面目录的单面转换，以及带封面目录的双面转换。
+
 ## v1.4.1
 
 ### 变更

@@ -32,7 +32,9 @@ AI 迭代必须直接面向当前工作树
 
 ## 功能基线
 
-- 命令：`./md2pdf.sh [INPUT] [OUTPUT_DIR]`。
+- 命令：`./md2pdf.sh [OPTIONS] [INPUT] [OUTPUT_DIR]`。
+- 默认双面打印；支持 `--single-sided`、`--double-sided` 切换单双面版式。
+- 支持 `--front-matter` 自动添加封面和目录。
 - `INPUT` 默认为当前目录。
 - `.md` 文件输入生成同名 `.pdf`。
 - 目录输入递归转换全部 `.md` 文件。
@@ -44,8 +46,8 @@ AI 迭代必须直接面向当前工作树
 - 构建目标平台：固定为 `linux/amd64`，使依赖的 Chrome for Testing 在 ARM 宿主机上通过模拟构建。
 - PDF 引擎：Pandoc + XeLaTeX。
 - 字体：`Noto Serif CJK SC`、`Noto Sans CJK SC`、`lmodern`、TeX Live 推荐字体。
-- 页面：A4、12pt、上/下/内侧 2 cm、外侧 1 cm。
-- 页脚外侧：`当前页 / 总页数`。
+- 页面：A4、12pt；双面上/下/内侧 2 cm、外侧 1 cm，单面上/下/左侧 2 cm、右侧 1 cm。
+- 页脚：双面位于外侧，单面位于右下，格式为 `当前页 / 总页数`。
 - Mermaid：普通 `mermaid` 围栏预渲染为高清 PNG 后嵌入 PDF，CLI 版本必须显式固定。
 - 安全：禁用网络、只读根文件系统、受限临时目录、`no-new-privileges`。
 

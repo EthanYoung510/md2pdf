@@ -66,17 +66,41 @@ GitHub Actions 会在 tag 构建时检查 tag 是否严格等于 `v<VERSION>`。
 ## 使用
 
 ```bash
-./md2pdf.sh [INPUT] [OUTPUT_DIR]
+./md2pdf.sh [OPTIONS] [INPUT] [OUTPUT_DIR]
 ```
 
 规则：
 
+- 默认使用双面打印版式。可在位置参数之前使用 `--single-sided` 或 `--double-sided` 显式选择版式。
+- 使用 `--front-matter` 时自动添加独立封面和目录。
 - `INPUT` 省略时默认为当前目录。
 - `INPUT` 是 `.md` 文件时生成同名 `.pdf`。
 - `INPUT` 是目录时递归转换全部 `.md` 文件。
 - 省略 `OUTPUT_DIR` 时，PDF 写入源 Markdown 同目录。
 - 指定 `OUTPUT_DIR` 时，所有 PDF 扁平写入该目录；如果不同源文件生成同名 PDF，脚本会报错退出。
 - Markdown 中的相对图片路径以源文件所在目录为基准解析。
+
+例如，生成带封面和目录的单面打印 PDF：
+
+```bash
+./md2pdf.sh --single-sided --front-matter report.md output
+```
+
+封面标题按以下顺序自动确定：
+
+1. Markdown YAML 元数据中的 `title`；
+2. 正文的首个一级标题；
+3. Markdown 文件名。
+
+如果标题来自首个一级标题，该标题会从正文移除，避免在封面和正文重复。YAML 中的 `author`、`date` 会由 Pandoc 一并显示在封面上。例如：
+
+```markdown
+---
+title: 项目报告
+author: 张三
+date: 2026-07-24
+---
+```
 
 ## 转换链路
 
@@ -85,7 +109,10 @@ GitHub Actions 会在 tag 构建时检查 tag 是否严格等于 `v<VERSION>`。
 3. 容器脚本扫描普通 `mermaid` 代码围栏。
 4. Mermaid CLI 通过 Puppeteer 配套的 Chrome for Testing 把图渲染为高清 PNG。
 5. Pandoc 调用 XeLaTeX，把处理后的 Markdown 转成 PDF。
-6. LaTeX header 设置 Noto CJK 字体、A4、12pt、上/下/内侧 2 cm、外侧 1 cm，并在页脚外侧显示 `当前页 / 总页数`。
+6. LaTeX header 设置 Noto CJK 字体、A4、12pt，并按单双面模式设置边距与页脚。
+7. 启用 `--front-matter` 时，Pandoc Lua filter 自动补齐标题，LaTeX `titlepage` 与 Pandoc TOC 生成封面和目录。
+
+双面模式使用上/下/内侧 2 cm、外侧 1 cm，并把页码放在页脚外侧。单面模式使用上/下/左侧 2 cm、右侧 1 cm，并把页码固定在右下角。两种模式的页码格式均为 `当前页 / 总页数`。
 
 ## 安全边界
 

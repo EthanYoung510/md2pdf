@@ -7,9 +7,12 @@
 ## 命令行
 
 ```bash
-./md2pdf.sh [INPUT] [OUTPUT_DIR]
+./md2pdf.sh [OPTIONS] [INPUT] [OUTPUT_DIR]
 ```
 
+- 默认使用双面打印版式；`--double-sided` 可显式选择双面版式。
+- `--single-sided` 选择单面打印版式。
+- `--front-matter` 自动添加封面和目录。
 - `INPUT` 省略时默认为当前目录 `./`。
 - `INPUT` 是 `.md` 文件时，生成同名 `.pdf`。
 - `INPUT` 是目录时，递归转换目录下所有 `.md` 文件。
@@ -28,8 +31,9 @@
 - 安装主流字体。
 - 正文字体为 `Noto Serif CJK SC`，无衬线字体为 `Noto Sans CJK SC`。
 - 默认页面为 A4、12pt。
-- 上、下、内侧边距为 2 cm，外侧边距为 1 cm。
-- 页脚外侧显示页码，格式为 `当前页 / 总页数`。
+- 双面打印时，上、下、内侧边距为 2 cm，外侧边距为 1 cm；页脚外侧显示 `当前页 / 总页数`。
+- 单面打印时，上、下、左侧边距为 2 cm，右侧边距为 1 cm；页码固定在右下角，格式为 `当前页 / 总页数`。
+- 启用封面和目录时，封面标题依次取 Markdown YAML `title`、首个一级标题、源文件名；使用首个一级标题时，从正文移除该标题以避免重复。YAML 中的 `author` 和 `date` 由 Pandoc 一并排入封面。
 - Markdown 中的相对图片路径以源文件所在目录为基准解析。
 - 支持普通 `mermaid` 代码围栏，转换前预渲染为高清 PNG 图片后嵌入 PDF；Mermaid CLI 版本在 Dockerfile 中显式固定。
 - 运行容器时不得下载字体、浏览器、npm 包或 TeX 包。
