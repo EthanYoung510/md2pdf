@@ -1,7 +1,70 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+usage() {
+  cat >&2 <<'EOF'
+Usage: ./md2pdf.sh [OPTIONS] [INPUT] [OUTPUT_DIR]
+
+Options:
+  -s, --single-sided   Use single-sided layout: left 2 cm, right 1 cm, page number at bottom right
+  -d, --double-sided   Use double-sided layout (default): inner 2 cm, outer 1 cm, page number outside
+  -f, --front-matter   Add a title page and table of contents
+  -h, --help           Show this help
+EOF
+}
+
 IMAGE=${MD2PDF_IMAGE:-md2pdf:latest}
+print_mode=
+front_matter=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -s|--single-sided)
+      if [[ -n "$print_mode" && "$print_mode" != single ]]; then
+        echo "ERROR: --single-sided and --double-sided cannot be used together" >&2
+        exit 64
+      fi
+      print_mode=single
+      shift
+      ;;
+    -d|--double-sided)
+      if [[ -n "$print_mode" && "$print_mode" != double ]]; then
+        echo "ERROR: --single-sided and --double-sided cannot be used together" >&2
+        exit 64
+      fi
+      print_mode=double
+      shift
+      ;;
+    -f|--front-matter)
+      front_matter=true
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      echo "ERROR: unknown option: $1" >&2
+      usage
+      exit 64
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+if [[ $# -gt 2 ]]; then
+  echo "ERROR: too many arguments" >&2
+  usage
+  exit 64
+fi
+
+print_mode=${print_mode:-double}
 INPUT=${1:-./}
 OUTPUT_DIR=${2:-}
 
@@ -61,6 +124,7 @@ for file in "${files[@]}"; do
     --security-opt no-new-privileges \
     -v "$(dirname "$file"):/source:ro" \
     -v "$(dirname "$out"):/output:rw" \
-    "$IMAGE" "/source/$(basename "$file")" "/output/$(basename "$out")"
+    "$IMAGE" "/source/$(basename "$file")" "/output/$(basename "$out")" \
+    "$print_mode" "$front_matter"
   echo "Wrote $out"
 done
