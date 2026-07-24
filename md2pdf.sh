@@ -6,10 +6,10 @@ usage() {
 Usage: ./md2pdf.sh [OPTIONS] [INPUT] [OUTPUT_DIR]
 
 Options:
-  --single-sided   Use single-sided layout: left 2 cm, right 1 cm, page number at bottom right
-  --double-sided   Use double-sided layout (default): inner 2 cm, outer 1 cm, page number outside
-  --front-matter   Add a title page and table of contents
-  -h, --help       Show this help
+  -s, --single-sided   Use single-sided layout: left 2 cm, right 1 cm, page number at bottom right
+  -d, --double-sided   Use double-sided layout (default): inner 2 cm, outer 1 cm, page number outside
+  -f, --front-matter   Add a title page and table of contents
+  -h, --help           Show this help
 EOF
 }
 
@@ -19,7 +19,7 @@ front_matter=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --single-sided)
+    -s|--single-sided)
       if [[ -n "$print_mode" && "$print_mode" != single ]]; then
         echo "ERROR: --single-sided and --double-sided cannot be used together" >&2
         exit 64
@@ -27,7 +27,7 @@ while [[ $# -gt 0 ]]; do
       print_mode=single
       shift
       ;;
-    --double-sided)
+    -d|--double-sided)
       if [[ -n "$print_mode" && "$print_mode" != double ]]; then
         echo "ERROR: --single-sided and --double-sided cannot be used together" >&2
         exit 64
@@ -35,7 +35,7 @@ while [[ $# -gt 0 ]]; do
       print_mode=double
       shift
       ;;
-    --front-matter)
+    -f|--front-matter)
       front_matter=true
       shift
       ;;

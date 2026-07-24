@@ -10,9 +10,9 @@
 ./md2pdf.sh [OPTIONS] [INPUT] [OUTPUT_DIR]
 ```
 
-- 默认使用双面打印版式；`--double-sided` 可显式选择双面版式。
-- `--single-sided` 选择单面打印版式。
-- `--front-matter` 自动添加封面和目录。
+- 默认使用双面打印版式；`-d`、`--double-sided` 可显式选择双面版式。
+- `-s`、`--single-sided` 选择单面打印版式。
+- `-f`、`--front-matter` 自动添加封面和目录。
 - `INPUT` 省略时默认为当前目录 `./`。
 - `INPUT` 是 `.md` 文件时，生成同名 `.pdf`。
 - `INPUT` 是目录时，递归转换目录下所有 `.md` 文件。

@@ -71,8 +71,8 @@ GitHub Actions 会在 tag 构建时检查 tag 是否严格等于 `v<VERSION>`。
 
 规则：
 
-- 默认使用双面打印版式。可在位置参数之前使用 `--single-sided` 或 `--double-sided` 显式选择版式。
-- 使用 `--front-matter` 时自动添加独立封面和目录。
+- 默认使用双面打印版式。可在位置参数之前使用 `-s` / `--single-sided` 或 `-d` / `--double-sided` 显式选择版式。
+- 使用 `-f` / `--front-matter` 时自动添加独立封面和目录。
 - `INPUT` 省略时默认为当前目录。
 - `INPUT` 是 `.md` 文件时生成同名 `.pdf`。
 - `INPUT` 是目录时递归转换全部 `.md` 文件。
@@ -83,7 +83,7 @@ GitHub Actions 会在 tag 构建时检查 tag 是否严格等于 `v<VERSION>`。
 例如，生成带封面和目录的单面打印 PDF：
 
 ```bash
-./md2pdf.sh --single-sided --front-matter report.md output
+./md2pdf.sh -s -f report.md output
 ```
 
 封面标题按以下顺序自动确定：

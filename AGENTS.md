@@ -33,8 +33,8 @@ AI 迭代必须直接面向当前工作树
 ## 功能基线
 
 - 命令：`./md2pdf.sh [OPTIONS] [INPUT] [OUTPUT_DIR]`。
-- 默认双面打印；支持 `--single-sided`、`--double-sided` 切换单双面版式。
-- 支持 `--front-matter` 自动添加封面和目录。
+- 默认双面打印；支持 `-s`、`--single-sided` 与 `-d`、`--double-sided` 切换单双面版式。
+- 支持 `-f`、`--front-matter` 自动添加封面和目录。
 - `INPUT` 默认为当前目录。
 - `.md` 文件输入生成同名 `.pdf`。
 - 目录输入递归转换全部 `.md` 文件。

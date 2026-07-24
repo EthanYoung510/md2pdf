@@ -31,10 +31,10 @@ jobs:
             "${RUNNER_TEMP}/md2pdf-smoke/single"
           printf '# Smoke test\n\n## 中文章节\n\n中文排版\n\n```mermaid\nflowchart LR\n  A --> B\n```\n' \
             > "${RUNNER_TEMP}/md2pdf-smoke/input/smoke.md"
-          ./md2pdf.sh \
+          ./md2pdf.sh -d \
             "${RUNNER_TEMP}/md2pdf-smoke/input/smoke.md" \
             "${RUNNER_TEMP}/md2pdf-smoke/double"
-          ./md2pdf.sh --single-sided --front-matter \
+          ./md2pdf.sh -s -f \
             "${RUNNER_TEMP}/md2pdf-smoke/input/smoke.md" \
             "${RUNNER_TEMP}/md2pdf-smoke/single"
           for pdf in \
@@ -56,6 +56,9 @@ jobs:
           grep -F -- '--tmpfs /tmp:rw,nosuid,nodev,noexec,size=512m' md2pdf.sh
           grep -F -- '--tmpfs /run:rw,nosuid,nodev,noexec,size=64m' md2pdf.sh
           grep -F -- '--security-opt no-new-privileges' md2pdf.sh
+          ./md2pdf.sh --help 2>&1 | grep -F -- '-s, --single-sided'
+          ./md2pdf.sh --help 2>&1 | grep -F -- '-d, --double-sided'
+          ./md2pdf.sh --help 2>&1 | grep -F -- '-f, --front-matter'
           grep -F -- '--variable geometry:top=2cm' docker/convert.sh
           grep -F -- '--variable geometry:bottom=2cm' docker/convert.sh
           grep -F -- '--variable geometry:left=2cm' docker/convert.sh
